@@ -1,0 +1,238 @@
+# Sistema de RH com IA Generativa
+
+Sistema completo de recrutamento inteligente com integração de IA generativa (OpenAI GPT) para análise, rankeamento e gestão de candidatos.
+
+## 🎯 Funcionalidades
+
+- ✅ **Rankeamento de Candidatos com IA**: Analisa e classifica candidatos para vagas usando GPT-4
+- ✅ **Resgate de Banco de Talentos com IA**: Busca inteligente no banco de talentos usando processamento de linguagem natural
+- ✅ **Análise Detalhada**: Análise completa de compatibilidade com recomendações e perguntas sugeridas
+- ✅ **Cadastro Completo**: Usuários (candidatos e funcionários) e vagas
+- ✅ **Gerenciamento de Skills**: Catálogo, adição a candidatos e vagas
+- ✅ **Cálculo de Compatibilidade**: Usando funções do banco Oracle
+- ✅ **Comentários e Agendamento**: Sistema de comentários e agendamento de reuniões
+
+## 📋 Pré-requisitos
+
+- Python 3.9 ou superior
+- Oracle Database 19c (acesso ao banco FIAP)
+- Conta OpenAI com API Key
+- Conta de email SMTP (Gmail recomendado)
+
+## 🚀 Como Rodar Localmente
+
+### 1. Clone o Repositório
+
+```bash
+git clone <url-do-repositorio>
+cd iot
+```
+
+### 2. Crie um Ambiente Virtual
+
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# Linux/Mac
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Instale as Dependências
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure as Variáveis de Ambiente
+
+Copie o arquivo `env.example` para `.env`:
+
+```bash
+# Windows
+copy env.example .env
+
+# Linux/Mac
+cp env.example .env
+```
+
+Edite o arquivo `.env` e configure suas credenciais:
+
+```env
+# Oracle Database
+ORACLE_USER=rm558515
+ORACLE_PASSWORD=sua_senha
+ORACLE_HOST=oracle.fiap.com.br
+ORACLE_PORT=1521
+ORACLE_SID=ORCL
+
+# OpenAI API (OBRIGATÓRIO)
+OPENAI_API_KEY=sk-sua-chave-aqui
+
+# Email SMTP (para envio de convites)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=seu_email@gmail.com
+SMTP_PASSWORD=sua_senha_app
+EMAIL_FROM=noreply@futurwork.com
+
+# API Configuration
+API_HOST=0.0.0.0
+API_PORT=8000
+API_DEBUG=True
+```
+
+**⚠️ IMPORTANTE**: 
+- Para Gmail, você precisa criar uma [Senha de App](https://support.google.com/accounts/answer/185833)
+- Obtenha sua API Key no [OpenAI Platform](https://platform.openai.com/api-keys)
+
+### 5. Execute a API
+
+```bash
+python main.py
+```
+
+Ou usando uvicorn diretamente:
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+A API estará disponível em: `http://localhost:8000`
+
+## 📚 Documentação da API
+
+Após iniciar a API, acesse:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+
+## 🧪 Testando a API
+
+### Health Check
+
+```bash
+curl http://localhost:8000/health
+```
+
+### Exemplo: Criar Candidato
+
+```bash
+curl -X POST http://localhost:8000/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "João Silva",
+    "email": "joao@email.com",
+    "role": "candidate",
+    "cpf": "123.456.789-00"
+  }'
+```
+
+### Exemplo: Criar Vaga
+
+```bash
+curl -X POST http://localhost:8000/api/jobs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "titulo": "Desenvolvedor Python",
+    "descricao": "Vaga para desenvolvedor Python",
+    "salario": 10000.00,
+    "nivel": "Pleno"
+  }'
+```
+
+### Exemplo: Rankear Candidatos
+
+```bash
+curl -X POST http://localhost:8000/api/candidates/ranking \
+  -H "Content-Type: application/json" \
+  -d '{
+    "job_id": 1,
+    "limit": 10,
+    "min_compatibility": 50.0
+  }'
+```
+
+## 📁 Estrutura do Projeto
+
+```
+iot/
+├── main.py                 # API FastAPI principal
+├── config.py               # Configurações da aplicação
+├── database.py             # Conexão Oracle
+├── models.py               # Modelos Pydantic
+├── requirements.txt        # Dependências Python
+├── env.example             # Exemplo de variáveis de ambiente
+├── README.md               # Este arquivo
+│
+└── services/
+    ├── __init__.py
+    ├── ai_service.py       # Serviço de IA (OpenAI)
+    ├── database_service.py # Serviço de banco de dados
+    └── email_service.py    # Serviço de email
+```
+
+## 🔧 Configuração do Banco de Dados
+
+Certifique-se de que o banco Oracle está configurado e acessível. As configurações de conexão estão no arquivo `.env`.
+
+## 🐛 Troubleshooting
+
+### Erro: "ModuleNotFoundError: No module named 'oracledb'"
+
+```bash
+pip install oracledb
+```
+
+### Erro: "ORA-12154: TNS:could not resolve the connect identifier"
+
+Verifique as configurações do Oracle no arquivo `.env` e certifique-se de que o banco está acessível.
+
+### Erro: "OpenAI API key not found"
+
+Configure `OPENAI_API_KEY` no arquivo `.env`.
+
+### Erro ao enviar email
+
+Para Gmail:
+1. Ative a verificação em 2 etapas
+2. Crie uma [Senha de App](https://support.google.com/accounts/answer/185833)
+3. Use a senha de app no `SMTP_PASSWORD`
+
+## 📝 Endpoints Principais
+
+- `GET /` - Endpoint raiz
+- `GET /health` - Health check
+- `GET /docs` - Documentação Swagger
+- `POST /api/users` - Criar usuário
+- `GET /api/users` - Listar usuários
+- `POST /api/jobs` - Criar vaga
+- `GET /api/jobs` - Listar vagas
+- `POST /api/candidates/ranking` - Rankear candidatos com IA
+- `POST /api/talent-pool/search` - Buscar no banco de talentos com IA
+- `POST /api/ai/analyze` - Análise detalhada de IA
+
+Para ver todos os endpoints, acesse: http://localhost:8000/docs
+
+## 🔗 Links Úteis
+
+- [OpenAI Platform](https://platform.openai.com/)
+- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- [Oracle Database](https://www.oracle.com/database/)
+
+## 👥 Autores
+
+- **Vinicius Murtinho Vicente** - RM551151
+- **Lucas Barreto Consentino** - RM557107
+- **Gustavo Bispo Cordeiro** - RM558515
+
+## 📝 Licença
+
+Projeto educacional desenvolvido para FIAP.
+
+---
+
+**Desenvolvido com ❤️ para o futuro do trabalho**
+
