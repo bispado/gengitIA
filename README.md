@@ -2,6 +2,10 @@
 
 Sistema completo de recrutamento inteligente com integração de IA generativa (OpenAI GPT) para análise, rankeamento e gestão de candidatos.
 
+## 🎥 Demonstração
+
+Assista ao vídeo de demonstração do sistema: [GenFit - Demonstração](https://youtu.be/razi04CvtIk)
+
 ## 🎯 Funcionalidades
 
 - ✅ **Rankeamento de Candidatos com IA**: Analisa e classifica candidatos para vagas usando GPT-4
