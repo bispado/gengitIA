@@ -87,10 +87,21 @@ class DatabaseService:
             if not row:
                 return None
             
+            # Converter LOB para string se necessário
+            descricao = row[2]
+            if descricao is not None:
+                if isinstance(descricao, oracledb.LOB):
+                    descricao = descricao.read()
+                elif hasattr(descricao, 'read'):
+                    descricao = descricao.read()
+                descricao = str(descricao) if descricao else ""
+            else:
+                descricao = ""
+            
             job = {
                 "id": row[0],
                 "title": row[1],
-                "description": row[2] or "",
+                "description": descricao,
                 "salary": row[3],
                 "location": row[4],
                 "contract_type": row[5],
@@ -556,10 +567,21 @@ class DatabaseService:
             
             jobs = []
             for row in cursor.fetchall():
+                # Converter LOB para string se necessário
+                descricao = row[2]
+                if descricao is not None:
+                    if isinstance(descricao, oracledb.LOB):
+                        descricao = descricao.read()
+                    elif hasattr(descricao, 'read'):
+                        descricao = descricao.read()
+                    descricao = str(descricao) if descricao else ""
+                else:
+                    descricao = ""
+                
                 job = {
                     "id": row[0],
                     "titulo": row[1],
-                    "descricao": row[2],
+                    "descricao": descricao,
                     "salario": row[3],
                     "localizacao": row[4],
                     "tipo_contrato": row[5],
